@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
@@ -11,17 +10,11 @@ const Navigation = () => {
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Menu', path: '/menu' },
+    { name: 'Pre-Order', path: '/pre-order' },
     { name: 'About', path: '/about' },
     { name: 'Reservations', path: '/reservations' },
-    { name: 'Gallery', path: '/gallery' },
     { name: 'Contact', path: '/contact' }
   ];
-
-  const handleOrderOnline = () => {
-    console.log('Order online clicked');
-    // TODO: Implement online ordering
-    alert('Online ordering coming soon!');
-  };
 
   return (
     <nav className="relative">
@@ -39,9 +32,6 @@ const Navigation = () => {
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
           </Link>
         ))}
-        <Button variant="outline" size="sm" onClick={handleOrderOnline}>
-          Order Online
-        </Button>
       </div>
 
       {/* Mobile Menu Button */}
@@ -66,19 +56,6 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
-            <div className="px-6 pt-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full"
-                onClick={() => {
-                  setIsOpen(false);
-                  handleOrderOnline();
-                }}
-              >
-                Order Online
-              </Button>
-            </div>
           </div>
         </div>
       )}

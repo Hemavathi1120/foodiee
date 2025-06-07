@@ -1,9 +1,10 @@
-
 import React, { useState } from 'react';
+import { toast } from '../hooks/use-toast';
 import Header from '../components/organisms/Header';
 import Footer from '../components/organisms/Footer';
 import Button from '../components/atoms/Button';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { storeContactMessage } from '../services/realtimeService';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -13,12 +14,30 @@ const Contact = () => {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact form submitted:', formData);
-    // TODO: Implement form submission
-    alert('Thank you for your message! We will get back to you soon.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    
+    try {
+      await storeContactMessage({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message
+      });
+      
+      toast({
+        title: "Message Sent",
+        description: "Thank you for your message! We will get back to you soon.",
+      });
+      
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

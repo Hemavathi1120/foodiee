@@ -1,54 +1,57 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../atoms/Button';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  ContactMessage, 
+  subscribeToContactMessages, 
+  updateMessageStatus, 
+  deleteMessage 
+} from '../../services/realtimeService';
 
 const MessageManagement = () => {
   const { toast } = useToast();
-  const [messages, setMessages] = useState([
-    {
-      id: '1',
-      name: 'Emma Thompson',
-      email: 'emma@example.com',
-      subject: 'Catering Inquiry',
-      message: 'Hi, I would like to inquire about catering services for a corporate event of 50 people. Could you please provide more details about your packages?',
-      status: 'unread',
-      createdAt: new Date('2024-01-15T16:30:00')
-    },
-    {
-      id: '2',
-      name: 'David Chen',
-      email: 'david@example.com',
-      subject: 'Compliment',
-      message: 'I had dinner at your restaurant last week and it was absolutely amazing! The wagyu tenderloin was perfectly cooked. Thank you for a wonderful experience.',
-      status: 'read',
-      createdAt: new Date('2024-01-14T14:20:00')
-    },
-    {
-      id: '3',
-      name: 'Sarah Miller',
-      email: 'sarah@example.com',
-      subject: 'Private Dining',
-      message: 'Do you have private dining rooms available for a birthday celebration? We would need space for about 12 people on February 10th.',
-      status: 'replied',
-      createdAt: new Date('2024-01-13T10:15:00')
-    }
-  ]);
-
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [replyModal, setReplyModal] = useState<{ isOpen: boolean; messageId: string }>({
     isOpen: false,
     messageId: ''
   });
 
-  const updateMessageStatus = (id: string, status: string) => {
-    setMessages(prev => prev.map(msg => 
-      msg.id === id ? { ...msg, status } : msg
-    ));
-    
-    if (status === 'replied') {
+  useEffect(() => {
+    const unsubscribe = subscribeToContactMessages((updatedMessages) => {
+      setMessages(updatedMessages);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleUpdateStatus = async (id: string, status: ContactMessage['status']) => {
+    try {
+      await updateMessageStatus(id, status);
       toast({
-        title: "Reply Sent",
-        description: "Your reply has been sent successfully",
+        title: "Status Updated",
+        description: `Message marked as ${status}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update message status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMessage(id);
+      toast({
+        title: "Message Deleted",
+        description: "Message has been removed",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete message",
+        variant: "destructive",
       });
     }
   };
@@ -63,7 +66,7 @@ const MessageManagement = () => {
   };
 
   const handleReply = (messageId: string) => {
-    updateMessageStatus(messageId, 'replied');
+    handleUpdateStatus(messageId, 'replied');
     setReplyModal({ isOpen: false, messageId: '' });
   };
 
@@ -97,7 +100,7 @@ const MessageManagement = () => {
               {message.status === 'unread' && (
                 <Button 
                   size="sm" 
-                  onClick={() => updateMessageStatus(message.id, 'read')}
+                  onClick={() => handleUpdateStatus(message.id, 'read')}
                 >
                   Mark as Read
                 </Button>
@@ -111,6 +114,13 @@ const MessageManagement = () => {
                   Reply
                 </Button>
               )}
+              <Button 
+                size="sm" 
+                variant="destructive"
+                onClick={() => handleDelete(message.id)}
+              >
+                Delete
+              </Button>
             </div>
           </div>
         ))}

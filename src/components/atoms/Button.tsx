@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
@@ -20,7 +19,8 @@ const Button = ({
   const variants = {
     primary: "bg-gradient-to-r from-amber-600 to-yellow-500 text-black hover:from-amber-500 hover:to-yellow-400 shadow-lg hover:shadow-xl",
     secondary: "bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 hover:border-amber-500",
-    outline: "border border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black"
+    outline: "border border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black",
+    destructive: "bg-red-600 text-white hover:bg-red-500 shadow-lg hover:shadow-xl"
   };
 
   const sizes = {
